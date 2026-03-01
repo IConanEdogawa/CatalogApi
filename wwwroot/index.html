@@ -23,7 +23,6 @@
 
 <body class="bg-slate-950 text-slate-100">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-    <!-- Header -->
     <div class="flex flex-col gap-2">
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Product Catalog</h1>
       <p class="text-slate-300">
@@ -31,7 +30,6 @@
       </p>
     </div>
 
-    <!-- Search + Refresh -->
     <div class="mt-6 flex flex-col md:flex-row md:items-center gap-3">
       <div class="flex-1">
         <input id="q" type="search" placeholder="Search products..."
@@ -52,178 +50,19 @@
       </div>
     </div>
 
-    <!-- Status -->
     <div class="mt-4 flex items-center justify-between text-sm text-slate-400">
       <div id="status">Loading...</div>
       <div id="count"></div>
     </div>
 
-    <!-- Grid -->
     <div id="grid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-    <!-- Footer -->
     <div class="mt-10 text-xs text-slate-500">
       Catalog viewer • Images and links are provided by the product source.
     </div>
   </div>
 
-  <script>
-    // ✅ CHANGE THIS to your backend URL
-    // Example: https://your-api.onrender.com
-    const API_BASE = "http://localhost:5186";
-
-    const grid = document.getElementById("grid");
-    const statusEl = document.getElementById("status");
-    const countEl = document.getElementById("count");
-    const qEl = document.getElementById("q");
-    const sortEl = document.getElementById("sort");
-    const refreshBtn = document.getElementById("refresh");
-
-    let allProducts = [];
-
-    function escapeHtml(str) {
-      return String(str ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function renderSkeleton() {
-      const skeletonCard = () => `
-        <div class="rounded-2xl overflow-hidden bg-slate-900 border border-slate-800">
-          <div class="aspect-[4/3] skeleton"></div>
-          <div class="p-4 space-y-3">
-            <div class="h-4 w-3/4 rounded-lg skeleton"></div>
-            <div class="h-4 w-full rounded-lg skeleton"></div>
-            <div class="h-4 w-2/3 rounded-lg skeleton"></div>
-            <div class="h-10 w-28 rounded-xl skeleton"></div>
-          </div>
-        </div>
-      `;
-      grid.innerHTML = Array.from({ length: 6 }).map(skeletonCard).join("");
-    }
-
-    function normalizeProduct(p) {
-      // support different casing from API
-      return {
-        id: p.id ?? p.Id ?? 0,
-        imageUrl: p.imageUrl ?? p.ImageUrl ?? "",
-        linkUrl: p.linkUrl ?? p.LinkUrl ?? "",
-        text: p.text ?? p.Text ?? "",
-        createdAt: p.createdAt ?? p.CreatedAt ?? null
-      };
-    }
-
-    function applyFiltersAndRender() {
-      const q = (qEl.value || "").trim().toLowerCase();
-      const sort = sortEl.value;
-
-      let items = allProducts.slice();
-
-      // Sort
-      items.sort((a, b) => {
-        const ax = a.id ?? 0, bx = b.id ?? 0;
-        return sort === "old" ? ax - bx : bx - ax;
-      });
-
-      // Filter
-      if (q) {
-        items = items.filter(p => (p.text || "").toLowerCase().includes(q));
-      }
-
-      countEl.textContent = items.length ? `${items.length} item(s)` : "";
-
-      if (!items.length) {
-        statusEl.textContent = q ? "No matches found." : "No products yet.";
-        grid.innerHTML = `
-          <div class="col-span-full p-6 rounded-2xl bg-slate-900 border border-slate-800">
-            <div class="text-lg font-semibold">Nothing to show</div>
-            <div class="mt-1 text-slate-300">
-              ${q ? "Try a different search query." : "Products will appear here once they are added to the database."}
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      statusEl.textContent = "Loaded.";
-
-      grid.innerHTML = items.map(p => {
-        const img = escapeHtml(p.imageUrl);
-        const link = escapeHtml(p.linkUrl);
-        const text = escapeHtml(p.text);
-
-        return `
-          <div class="rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hover:border-slate-600 transition">
-            <div class="aspect-[4/3] bg-slate-950 overflow-hidden">
-              <img src="${img}" alt="product"
-                class="w-full h-full object-cover"
-                loading="lazy"
-                onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'p-4 text-slate-400\\'>Image failed to load</div>';" />
-            </div>
-
-            <div class="p-4 space-y-3">
-              <div class="text-slate-200 line-clamp-3">${text}</div>
-
-              <a href="${link}" target="_blank" rel="noopener"
-                class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 transition">
-                Open →
-              </a>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    async function loadProducts() {
-      statusEl.textContent = "Loading...";
-      countEl.textContent = "";
-      renderSkeleton();
-
-      try {
-        const res = await fetch(`${API_BASE}/api/products`, {
-          headers: { "Accept": "application/json" }
-        });
-
-        if (!res.ok) {
-          const t = await res.text();
-          throw new Error(t || `HTTP ${res.status}`);
-        }
-
-        const data = await res.json();
-        allProducts = Array.isArray(data) ? data.map(normalizeProduct) : [];
-        applyFiltersAndRender();
-      } catch (e) {
-        statusEl.textContent = "Failed to load.";
-        grid.innerHTML = `
-          <div class="col-span-full p-6 rounded-2xl bg-slate-900 border border-red-900/40">
-            <div class="text-lg font-semibold text-red-300">Error</div>
-            <div class="mt-1 text-slate-300">
-              Could not load products from API.
-            </div>
-            <div class="mt-3 text-xs text-slate-400 break-words">
-              API: <span class="text-slate-200">${escapeHtml(API_BASE)}</span><br/>
-              Details: <span class="text-slate-200">${escapeHtml(e?.message || "Unknown error")}</span>
-            </div>
-            <button onclick="location.reload()"
-              class="mt-4 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition">
-              Reload
-            </button>
-          </div>
-        `;
-      }
-    }
-
-    // Events
-    qEl.addEventListener("input", () => applyFiltersAndRender());
-    sortEl.addEventListener("change", () => applyFiltersAndRender());
-    refreshBtn.addEventListener("click", () => loadProducts());
-
-    // Initial load
-    loadProducts();
-  </script>
+  <!-- only ONE script -->
+  <script src="./app.js"></script>
 </body>
 </html>
-<script src="./app.js"></script>

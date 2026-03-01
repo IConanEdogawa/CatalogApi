@@ -2,8 +2,6 @@
 
 (() => {
 
-const API_BASE = "http://localhost:5138";
-
 const grid = document.getElementById("grid");
 const statusEl = document.getElementById("status");
 const countEl = document.getElementById("count");
@@ -31,49 +29,33 @@ function normalizeProduct(p){
   };
 }
 
-// convert relative image path to full url
+// On same domain: "/uploads/..." is already correct.
+// If admin ever stores full http url, also ok.
 function resolveImage(url){
-
   if(!url) return "";
-
-  if(url.startsWith("http")) return url;
-
-  return API_BASE + url;
+  return url; // keep as-is
 }
-
-// ---------- sorting ----------
 
 function sortProducts(items,mode){
-
   const arr = items.slice();
-
   arr.sort((a,b)=>{
-
     const ax = a.id ?? 0;
     const bx = b.id ?? 0;
-
     return mode === "old" ? ax - bx : bx - ax;
-
   });
-
   return arr;
-
 }
-
-// ---------- rendering ----------
 
 function renderProducts(items){
 
-  countEl.textContent = `${items.length} item(s)`;
+  countEl.textContent = items.length ? `${items.length} item(s)` : "";
 
   if(!items.length){
-
     grid.innerHTML = `
       <div class="col-span-full p-6 rounded-2xl bg-slate-900 border border-slate-800">
         No products yet.
       </div>
     `;
-
     return;
   }
 
@@ -85,94 +67,70 @@ function renderProducts(items){
 
     return `
       <div class="rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hover:border-slate-600 transition">
-
         <div class="aspect-[4/3] bg-slate-950 overflow-hidden">
-
-          <img src="${img}"
-          class="w-full h-full object-cover"
-          loading="lazy"/>
-
+          <img src="${img}" alt="product"
+               class="w-full h-full object-cover"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'p-4 text-slate-400\\'>Image failed to load</div>';" />
         </div>
 
         <div class="p-4 space-y-3">
-
           <div class="text-slate-200 line-clamp-3">${text}</div>
 
-          <a href="${link}" target="_blank"
-          class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 transition">
-
+          <a href="${link}" target="_blank" rel="noopener"
+             class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 transition">
             Open →
-
           </a>
-
         </div>
-
       </div>
     `;
-
   }).join("");
-
 }
-
-// ---------- filters ----------
 
 function applyFilters(){
 
-  const q = (qEl?.value || "").toLowerCase();
+  const q = (qEl?.value || "").toLowerCase().trim();
   const sortMode = sortEl?.value || "new";
 
-  let items = sortProducts(allProducts,sortMode);
+  let items = sortProducts(allProducts, sortMode);
 
   if(q){
-
-    items = items.filter(p =>
-      (p.text || "").toLowerCase().includes(q)
-    );
-
+    items = items.filter(p => (p.text || "").toLowerCase().includes(q));
   }
 
+  statusEl.textContent = "Loaded.";
   renderProducts(items);
-
 }
-
-// ---------- API ----------
 
 async function loadProducts(){
 
   statusEl.textContent = "Loading...";
 
   try{
+    const res = await fetch(`/api/products`, { headers: { "Accept": "application/json" } });
 
-    const res = await fetch(`${API_BASE}/api/products`);
-
-    if(!res.ok) throw new Error();
+    if(!res.ok){
+      const t = await res.text();
+      throw new Error(t || `HTTP ${res.status}`);
+    }
 
     const data = await res.json();
-
-    allProducts = data.map(normalizeProduct);
-
-    statusEl.textContent = "Loaded.";
-
-  }catch{
-
-    statusEl.textContent = "API not available.";
-
+    allProducts = Array.isArray(data) ? data.map(normalizeProduct) : [];
+  }
+  catch(e){
+    statusEl.textContent = "Failed to load.";
     allProducts = [];
-
   }
 
   applyFilters();
-
 }
 
-// ---------- events ----------
+// events
+qEl?.addEventListener("input", applyFilters);
+sortEl?.addEventListener("change", applyFilters);
+refreshBtn?.addEventListener("click", loadProducts);
 
-qEl?.addEventListener("input",applyFilters);
-sortEl?.addEventListener("change",applyFilters);
-refreshBtn?.addEventListener("click",loadProducts);
-
-// ---------- init ----------
-
+// init
 loadProducts();
 
 })();

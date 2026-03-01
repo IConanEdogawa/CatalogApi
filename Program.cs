@@ -36,7 +36,7 @@ app.UseStaticFiles();
 const string ADMIN_FILE = "/5755nimda.html";
 
 var adminPassword =
-    Environment.GetEnvironmentVariable("9903Bekzod!") ?? "change-me";
+    Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "change-me";
 
 bool IsAuthed(HttpRequest req)
 {

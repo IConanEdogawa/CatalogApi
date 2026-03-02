@@ -2,6 +2,7 @@
 
 (() => {
 
+const site = document.body.dataset.site || "a";
 const grid = document.getElementById("grid");
 const statusEl = document.getElementById("status");
 const countEl = document.getElementById("count");
@@ -107,7 +108,9 @@ async function loadProducts(){
   statusEl.textContent = "Loading...";
 
   try{
-    const res = await fetch(`/api/products`, { headers: { "Accept": "application/json" } });
+    const res = await fetch(`/api/products?site=${site}`, {
+  headers: { "Accept": "application/json" }
+});
 
     if(!res.ok){
       const t = await res.text();

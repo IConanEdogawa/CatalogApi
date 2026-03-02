@@ -114,14 +114,28 @@ static bool IsValidUrl(string s) =>
 
 app.MapGet("/", () => Results.Redirect("/index.html"));
 
+// будущие витрины
+app.MapGet("/a", () => Results.Redirect("/catalog-a.html"));
+app.MapGet("/b", () => Results.Redirect("/catalog-b.html"));
+app.MapGet("/c", () => Results.Redirect("/catalog-c.html"));
+
 
 
 // -------------------- API: Get Products --------------------
 
-app.MapGet("/api/products", async (AppDbContext db) =>
-    await db.Products
+app.MapGet("/api/products", async (HttpRequest req, AppDbContext db) =>
+{
+    var site = req.Query["site"].ToString().Trim().ToLowerInvariant();
+
+    var q = db.Products.AsQueryable();
+
+    if (!string.IsNullOrWhiteSpace(site))
+        q = q.Where(p => p.Site == site);
+
+    return await q
         .OrderByDescending(x => x.Id)
-        .ToListAsync());
+        .ToListAsync();
+});
 
 
 
@@ -137,6 +151,14 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
     var file = form.Files.GetFile("image");
     var linkUrl = form["linkUrl"].ToString();
     var text = form["text"].ToString();
+
+    // NEW
+    var site = form["site"].ToString().Trim().ToLowerInvariant();
+    if (string.IsNullOrWhiteSpace(site))
+        site = "a";
+
+    if (site is not ("a" or "b" or "c"))
+        return Results.BadRequest("Invalid site.");
 
     if (file is null || file.Length == 0)
         return Results.BadRequest("Image file required.");
@@ -175,6 +197,7 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
         ImageUrl = $"/uploads/{fileName}",
         LinkUrl = linkUrl.Trim(),
         Text = text.Trim(),
+        Site = site,
         CreatedAt = DateTime.UtcNow
     };
 

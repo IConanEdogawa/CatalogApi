@@ -2,10 +2,12 @@
 
 const el = (id) => document.getElementById(id);
 
+
 const form = el("form");
 const imageFileEl = el("imageFile");
 const linkUrlEl = el("linkUrl");
 const textEl = el("text");
+const siteEl = el("site");
 
 const previewImage = el("previewImage");
 const previewSkeleton = el("previewSkeleton");
@@ -109,6 +111,7 @@ form.addEventListener("submit", async (e) => {
     formData.append("image", file);
     formData.append("linkUrl", linkUrl);
     formData.append("text", text);
+    formData.append("site", siteEl.value);
 
     // same-origin POST
     const res = await fetch(`/api/products`, {

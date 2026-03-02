@@ -10,6 +10,47 @@ const qEl = document.getElementById("q");
 const sortEl = document.getElementById("sort");
 const refreshBtn = document.getElementById("refresh");
 
+// style helpers for alternate look
+function cardClasses(){
+  // site b will render a simple horizontal list entry
+  if(site === "b"){
+    return "flex flex-col sm:flex-row items-center bg-gray-100 border-b border-gray-300 p-4 gap-4";
+  }
+  // site c is the light card
+  if(site === "c"){
+    return "rounded-lg overflow-hidden bg-white border border-slate-200 hover:shadow-lg transition";
+  }
+  // default (site a) dark rounded card
+  return "rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hover:border-slate-600 transition";
+}
+
+function imageWrapperClasses(){
+  if(site === "b"){
+    // fixed height banner on left
+    return "w-full sm:w-1/4 h-32 bg-gray-200 overflow-hidden flex-shrink-0";
+  }
+  if(site === "c"){
+    return "aspect-[4/3] bg-slate-50 overflow-hidden";
+  }
+  return "aspect-[4/3] bg-slate-950 overflow-hidden";
+}
+
+function textClasses(){
+  if(site === "b"){
+    return "text-gray-800 text-base sm:text-lg"; // no clamp
+  }
+  return site === "c" ? "text-slate-900 line-clamp-3" : "text-slate-200 line-clamp-3";
+}
+
+function linkButtonClasses(){
+  if(site === "b"){
+    return "text-indigo-600 hover:underline text-sm sm:text-base";
+  }
+  return site === "c"
+    ? "inline-flex items-center justify-center px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition text-white"
+    : "inline-flex items-center justify-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 transition";
+}
+
 let allProducts = [];
 
 // ---------- helpers ----------
@@ -66,9 +107,10 @@ function renderProducts(items){
     const link = escapeHtml(p.linkUrl);
     const text = escapeHtml(p.text);
 
+    // build markup with classes determined by helpers
     return `
-      <div class="rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 hover:border-slate-600 transition">
-        <div class="aspect-[4/3] bg-slate-950 overflow-hidden">
+      <div class="${cardClasses()}">
+        <div class="${imageWrapperClasses()}">
           <img src="${img}" alt="product"
                class="w-full h-full object-cover"
                loading="lazy"
@@ -76,10 +118,10 @@ function renderProducts(items){
         </div>
 
         <div class="p-4 space-y-3">
-          <div class="text-slate-200 line-clamp-3">${text}</div>
+          <div class="${textClasses()}">${text}</div>
 
           <a href="${link}" target="_blank" rel="noopener"
-             class="inline-flex items-center justify-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 transition">
+             class="${linkButtonClasses()}">
             Open →
           </a>
         </div>

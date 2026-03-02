@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalog – alternate style</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* keep skeleton animation for consistency */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(0,0,0,.04), rgba(0,0,0,.12), rgba(0,0,0,.04));
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .line-clamp-3{
+      display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+    }
+  </style>
+</head>
+
+<body data-site="c" class="bg-white text-slate-800">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-indigo-600">Product Catalog</h1>
+      <p class="text-slate-600">
+        Browse a different look of the catalog. Click a card to open the product link.
+      </p>
+    </div>
+
+    <div class="mt-6 flex flex-col md:flex-row md:items-center gap-3">
+      <div class="flex-1">
+        <input id="q" type="search" placeholder="Search products..."
+          class="w-full px-4 py-3 rounded-lg bg-slate-100 border border-slate-300 outline-none focus:border-indigo-400" />
+      </div>
+
+      <div class="flex gap-3">
+        <button id="refresh"
+          class="px-4 py-3 rounded-lg bg-indigo-100 border border-indigo-300 hover:bg-indigo-200 transition">
+          Refresh
+        </button>
+
+        <select id="sort"
+          class="px-4 py-3 rounded-lg bg-slate-100 border border-slate-300 outline-none focus:border-indigo-400">
+          <option value="new">Newest</option>
+          <option value="old">Oldest</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
+      <div id="status">Loading...</div>
+      <div id="count"></div>
+    </div>
+
+    <div id="grid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+    <div class="mt-10 text-xs text-slate-400">
+      Catalog viewer (alternate) • Images and links are provided by the product source.
+    </div>
+  </div>
+
+  <!-- reuse the same script logic -->
+  <script src="./viewer.js"></script>
+</body>
+</html>

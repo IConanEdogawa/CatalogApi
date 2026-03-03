@@ -18,6 +18,7 @@ const submitBtn = el("submitBtn");
 const msgEl = el("msg");
 const countEl = el("count");
 const apiBadge = el("apiBadge");
+let authHeader = sessionStorage.getItem("adminBasicAuth") || "";
 
 // ---------- helpers ----------
 
@@ -43,6 +44,57 @@ function isValidUrl(s){
 
 function updateCounter(){
   countEl.textContent = textEl.value.length;
+}
+
+function toBasicHeader(username, password){
+  return "Basic " + btoa(`${username}:${password}`);
+}
+
+function askCredentials(){
+  const username = window.prompt("Admin login:", "admin");
+  if(username === null) return null;
+
+  const password = window.prompt("Admin password:");
+  if(password === null) return null;
+
+  return toBasicHeader(username, password);
+}
+
+async function fetchWithRetry(url, options = {}){
+  const makeRequest = async (headerValue) => {
+    const headers = new Headers(options.headers || {});
+    if(headerValue){
+      headers.set("Authorization", headerValue);
+    }
+
+    return fetch(url, {
+      ...options,
+      headers
+    });
+  };
+
+  let res = await makeRequest(authHeader);
+
+  if(res.status !== 401){
+    return res;
+  }
+
+  const nextHeader = askCredentials();
+  if(!nextHeader){
+    return res;
+  }
+
+  authHeader = nextHeader;
+  sessionStorage.setItem("adminBasicAuth", authHeader);
+
+  res = await makeRequest(authHeader);
+
+  if(res.status === 401){
+    sessionStorage.removeItem("adminBasicAuth");
+    authHeader = "";
+  }
+
+  return res;
 }
 
 // ---------- preview ----------
@@ -79,7 +131,9 @@ async function pingApi(){
   apiBadge.textContent = "API: checking...";
 
   try{
-    const res = await fetch(`/api/products`, { headers: { "Accept": "application/json" } });
+    const res = await fetchWithRetry(`/api/products`, {
+      headers: { "Accept": "application/json" }
+    });
     if(!res.ok) throw new Error();
 
     apiBadge.textContent = "API: online";
@@ -114,12 +168,15 @@ form.addEventListener("submit", async (e) => {
     formData.append("site", siteEl.value);
 
     // same-origin POST
-    const res = await fetch(`/api/products`, {
+    const res = await fetchWithRetry(`/api/products`, {
       method: "POST",
       body: formData
     });
 
     if(!res.ok){
+      if(res.status === 401){
+        throw new Error("UNAUTHORIZED");
+      }
       const t = await res.text();
       throw new Error(t || `HTTP ${res.status}`);
     }
@@ -133,8 +190,11 @@ form.addEventListener("submit", async (e) => {
     updateCounter();
     updatePreview();
   }catch(err){
-    // если Basic Auth не введён — будет 401, это ок
-    setMsg("Failed to create (check login/password).", "err");
+    if(err && err.message === "UNAUTHORIZED"){
+      setMsg("Invalid login/password. Try again.", "err");
+    }else{
+      setMsg("Failed to create (check login/password).", "err");
+    }
   }finally{
     submitBtn.disabled = false;
   }

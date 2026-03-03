@@ -33,7 +33,9 @@ app.UseStaticFiles();
 
 // -------------------- Admin Security --------------------
 
-const string ADMIN_FILE = "/5755nimda.html";
+// path to the admin page (obfuscated for security)
+const string ADMIN_FILE = "/z3x9v7w1.html"; // was 5755nimda.html
+
 
 var adminPassword =
     Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "change-me";
@@ -112,12 +114,14 @@ static bool IsValidUrl(string s) =>
 
 // -------------------- Routes --------------------
 
-app.MapGet("/", () => Results.Redirect("/index.html"));
+// root goes straight to the first catalog (site a) instead of an index file
+app.MapGet("/", () => Results.Redirect("/f9b3c1a2.html"));
 
-// будущие витрины
-app.MapGet("/a", () => Results.Redirect("/catalog-a.html"));
-app.MapGet("/b", () => Results.Redirect("/catalog-b.html"));
-app.MapGet("/c", () => Results.Redirect("/catalog-c.html"));
+
+// future storefronts – use the obfuscated filenames so they can't be guessed
+app.MapGet("/a", () => Results.Redirect("/f9b3c1a2.html"));
+app.MapGet("/b", () => Results.Redirect("/q7r8s2t4.html"));
+app.MapGet("/c", () => Results.Redirect("/k1m4n6p8.html"));
 
 
 

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://0.0.0.0:5138");
 
 
 
@@ -238,3 +239,4 @@ var port =
     Environment.GetEnvironmentVariable("PORT") ?? "5138";
 
 app.Run($"http://0.0.0.0:{port}");
+

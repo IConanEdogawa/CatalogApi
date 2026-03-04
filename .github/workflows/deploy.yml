@@ -2,24 +2,27 @@ name: Deploy to VPS
 
 on:
   push:
-    branches:
-      - master
+    branches: [ "master" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Deploy to server
+      - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
+          port: 22
           key: ${{ secrets.VPS_SSH_KEY }}
-
+          debug: true
+          script_stop: true
+          timeout: 60s
+          command_timeout: 30m
           script: |
+            set -e
             cd /var/www/CatalogApi
             git pull
             dotnet publish CatalogApi.csproj -c Release -o /var/www/catalogapi/publish
             systemctl restart catalogapi
-            
+            systemctl status catalogapi --no-pager

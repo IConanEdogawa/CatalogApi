@@ -1,6 +1,7 @@
 using CatalogApi.Data;
 using CatalogApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.Features;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +19,16 @@ var builder = WebApplication.CreateBuilder(args);
 // DB
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+
+// Upload limits for multipart/form-data (images from admin panel)
+builder.WebHost.ConfigureKestrel(o =>
+{
+    o.Limits.MaxRequestBodySize = 50 * 1024 * 1024; // 50 MB
+});
+builder.Services.Configure<FormOptions>(o =>
+{
+    o.MultipartBodyLengthLimit = 50 * 1024 * 1024; // 50 MB
+});
 
 // CORS
 builder.Services.AddCors(opt =>
@@ -283,12 +294,24 @@ app.MapGet("/api/products", async (HttpRequest req, AppDbContext db) =>
 
 // -------------------- API: Create Product (ADMIN ONLY) --------------------
 
-app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
+app.MapPost("/api/products", async (HttpRequest request, AppDbContext db, ILogger<Program> logger) =>
 {
     if (!request.HasFormContentType)
+    {
+        logger.LogWarning("Create product rejected: Expected multipart/form-data. Content-Type={ContentType}", request.ContentType);
         return Results.BadRequest("Expected multipart/form-data.");
+    }
 
-    var form = await request.ReadFormAsync();
+    IFormCollection form;
+    try
+    {
+        form = await request.ReadFormAsync();
+    }
+    catch (Exception ex)
+    {
+        logger.LogWarning(ex, "Create product rejected while parsing form-data.");
+        return Results.BadRequest($"Invalid multipart/form-data: {ex.Message}");
+    }
 
     var file = form.Files.GetFile("image");
     var linkUrl = form["linkUrl"].ToString();
@@ -304,18 +327,31 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
 
     var site = NormalizeSite(siteRaw);
     if (site is null)
+    {
+        logger.LogWarning("Create product rejected: invalid site '{SiteRaw}'", siteRaw);
         return Results.BadRequest("Invalid site.");
+    }
 
     if (file is null || file.Length == 0)
+    {
+        logger.LogWarning("Create product rejected: image missing.");
         return Results.BadRequest("Image file required.");
+    }
 
     if (string.IsNullOrWhiteSpace(linkUrl) ||
         string.IsNullOrWhiteSpace(cost) ||
         string.IsNullOrWhiteSpace(text))
+    {
+        logger.LogWarning("Create product rejected: required fields missing. linkUrl={HasLink} cost={HasCost} text={HasText}",
+            !string.IsNullOrWhiteSpace(linkUrl), !string.IsNullOrWhiteSpace(cost), !string.IsNullOrWhiteSpace(text));
         return Results.BadRequest("linkUrl, cost and text are required.");
+    }
 
     if (!IsValidUrl(linkUrl))
+    {
+        logger.LogWarning("Create product rejected: invalid linkUrl '{LinkUrl}'", linkUrl);
         return Results.BadRequest("Invalid linkUrl.");
+    }
 
     var ext = Path.GetExtension(file.FileName);
 
@@ -327,7 +363,10 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
     };
 
     if (string.IsNullOrWhiteSpace(ext) || !allowed.Contains(ext))
+    {
+        logger.LogWarning("Create product rejected: unsupported extension '{Ext}'", ext);
         return Results.BadRequest("Unsupported image format.");
+    }
 
     var webRoot = app.Environment.WebRootPath ?? "wwwroot";
     var uploadsDir = Path.Combine(webRoot, "uploads");
@@ -351,6 +390,7 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
 
     db.Products.Add(product);
     await db.SaveChangesAsync();
+    logger.LogInformation("Product created. Id={Id}, Site={Site}, Image={ImageUrl}", product.Id, product.Site, product.ImageUrl);
 
     return Results.Created($"/api/products/{product.Id}", product);
 }).RequireAuthorization();

@@ -271,6 +271,7 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
 
     var file = form.Files.GetFile("image");
     var linkUrl = form["linkUrl"].ToString();
+    var cost = form["cost"].ToString();
     var text = form["text"].ToString();
 
     var site = form["site"].ToString().Trim().ToLowerInvariant();
@@ -284,8 +285,9 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
         return Results.BadRequest("Image file required.");
 
     if (string.IsNullOrWhiteSpace(linkUrl) ||
+        string.IsNullOrWhiteSpace(cost) ||
         string.IsNullOrWhiteSpace(text))
-        return Results.BadRequest("linkUrl and text are required.");
+        return Results.BadRequest("linkUrl, cost and text are required.");
 
     if (!IsValidUrl(linkUrl))
         return Results.BadRequest("Invalid linkUrl.");
@@ -312,6 +314,7 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
     {
         ImageUrl = $"/uploads/{fileName}",
         LinkUrl = linkUrl.Trim(),
+        Cost = cost.Trim(),
         Text = text.Trim(),
         Site = site,
         CreatedAt = DateTime.UtcNow

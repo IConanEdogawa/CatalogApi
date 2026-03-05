@@ -6,11 +6,13 @@ const el = (id) => document.getElementById(id);
 const form = el("form");
 const imageFileEl = el("imageFile");
 const linkUrlEl = el("linkUrl");
+const costEl = el("cost");
 const textEl = el("text");
 const siteEl = el("site");
 
 const previewImage = el("previewImage");
 const previewSkeleton = el("previewSkeleton");
+const previewCost = el("previewCost");
 const previewText = el("previewText");
 const previewLink = el("previewLink");
 
@@ -49,8 +51,10 @@ function updateCounter(){
 
 function updatePreview(){
   const linkUrl = linkUrlEl.value.trim();
+  const cost = costEl.value.trim();
   const text = textEl.value.trim();
 
+  previewCost.textContent = cost || "Cost will appear here...";
   previewText.textContent = text || "Your description will appear here...";
   previewLink.href = isValidUrl(linkUrl) ? linkUrl : "#";
 }
@@ -99,10 +103,12 @@ form.addEventListener("submit", async (e) => {
 
   const file = imageFileEl.files[0];
   const linkUrl = linkUrlEl.value.trim();
+  const cost = costEl.value.trim();
   const text = textEl.value.trim();
 
   if(!file){ setMsg("Image file required", "err"); return; }
   if(!isValidUrl(linkUrl)){ setMsg("Invalid product URL", "err"); return; }
+  if(!cost){ setMsg("Cost required", "err"); return; }
   if(!text){ setMsg("Text required", "err"); return; }
 
   submitBtn.disabled = true;
@@ -112,6 +118,7 @@ form.addEventListener("submit", async (e) => {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("linkUrl", linkUrl);
+    formData.append("cost", cost);
     formData.append("text", text);
     formData.append("site", siteEl.value);
 
@@ -143,6 +150,7 @@ form.addEventListener("submit", async (e) => {
 
 // ---------- events ----------
 linkUrlEl.addEventListener("input", updatePreview);
+costEl.addEventListener("input", updatePreview);
 textEl.addEventListener("input", () => { updatePreview(); updateCounter(); });
 
 // ---------- init ----------

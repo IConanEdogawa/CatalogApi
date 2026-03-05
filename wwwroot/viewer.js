@@ -51,6 +51,15 @@ function linkButtonClasses(){
     : "inline-flex items-center justify-center px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 transition";
 }
 
+function costClasses(){
+  if(site === "b"){
+    return "inline-flex items-center px-2 py-1 rounded-md bg-emerald-100 text-emerald-800 font-semibold text-sm";
+  }
+  return site === "c"
+    ? "inline-flex items-center px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700 font-semibold text-sm"
+    : "inline-flex items-center px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 font-semibold text-sm";
+}
+
 let allProducts = [];
 
 // ---------- helpers ----------
@@ -67,6 +76,7 @@ function normalizeProduct(p){
     id: p.id ?? p.Id ?? 0,
     imageUrl: p.imageUrl ?? p.ImageUrl ?? "",
     linkUrl: p.linkUrl ?? p.LinkUrl ?? "",
+    cost: p.cost ?? p.Cost ?? "",
     text: p.text ?? p.Text ?? ""
   };
 }
@@ -105,6 +115,7 @@ function renderProducts(items){
 
     const img = resolveImage(p.imageUrl);
     const link = escapeHtml(p.linkUrl);
+    const cost = escapeHtml(p.cost || "");
     const text = escapeHtml(p.text);
 
     // build markup with classes determined by helpers
@@ -118,6 +129,8 @@ function renderProducts(items){
         </div>
 
         <div class="p-4 space-y-3">
+          <div class="${costClasses()}">${cost || "Price unavailable"}</div>
+
           <div class="${textClasses()}">${text}</div>
 
           <a href="${link}" target="_blank" rel="noopener"
@@ -138,7 +151,9 @@ function applyFilters(){
   let items = sortProducts(allProducts, sortMode);
 
   if(q){
-    items = items.filter(p => (p.text || "").toLowerCase().includes(q));
+    items = items.filter(p =>
+      (p.text || "").toLowerCase().includes(q) ||
+      (p.cost || "").toLowerCase().includes(q));
   }
 
   statusEl.textContent = "Loaded.";

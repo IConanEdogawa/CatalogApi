@@ -1,7 +1,6 @@
 using CatalogApi.Data;
 using CatalogApi.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:5138");
@@ -29,70 +28,6 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 app.UseStaticFiles();
-
-
-
-// -------------------- Admin Security --------------------
-
-// path to the admin page (obfuscated for security)
-const string ADMIN_FILE = "/z3x9v7w1.html"; // was 5755nimda.html
-
-
-var adminPassword =
-    Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "change-me";
-
-bool IsAuthed(HttpRequest req)
-{
-    if (!req.Headers.TryGetValue("Authorization", out var auth))
-        return false;
-
-    var s = auth.ToString();
-
-    if (!s.StartsWith("Basic "))
-        return false;
-
-    try
-    {
-        var raw = Convert.FromBase64String(s["Basic ".Length..]);
-        var creds = Encoding.UTF8.GetString(raw);
-
-        var parts = creds.Split(':', 2);
-
-        if (parts.Length != 2)
-            return false;
-
-        return parts[0] == "admin" && parts[1] == adminPassword;
-    }
-    catch
-    {
-        return false;
-    }
-}
-
-app.Use(async (ctx, next) =>
-{
-    var path = ctx.Request.Path.Value ?? "";
-
-    var isAdminPage =
-        path.Equals(ADMIN_FILE, StringComparison.OrdinalIgnoreCase);
-
-    var isWriteApi =
-        path.StartsWith("/api/products", StringComparison.OrdinalIgnoreCase)
-        && (ctx.Request.Method == "POST" || ctx.Request.Method == "DELETE");
-
-    if (isAdminPage || isWriteApi)
-    {
-        if (!IsAuthed(ctx.Request))
-        {
-            ctx.Response.Headers["WWW-Authenticate"] = "Basic realm=\"Admin\"";
-            ctx.Response.StatusCode = 401;
-            await ctx.Response.WriteAsync("Unauthorized");
-            return;
-        }
-    }
-
-    await next();
-});
 
 
 

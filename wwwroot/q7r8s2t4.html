@@ -3,49 +3,52 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SimpleCatalog – Clean View</title>
+  <title>Aurum Division - Executive Catalog</title>
+  <meta name="description" content="Executive-grade catalog experience for Site B." />
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preload" href="./themes/corporate-luxe/q7r8s2t4.css?v=20260305-1" as="style" />
+  <link rel="stylesheet" href="./themes/corporate-luxe/q7r8s2t4.css?v=20260305-1" />
+  <!-- Reserve theme (manual): <link rel="stylesheet" href="./themes/deep-teal/unified-theme.css?v=20260305-1" /> -->
 </head>
+<body data-site="b">
+  <div class="bg-orb bg-orb-a" aria-hidden="true"></div>
+  <div class="bg-orb bg-orb-b" aria-hidden="true"></div>
 
-<body data-site="c" class="bg-gray-100 text-gray-900">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-    <header class="mb-6 text-center">
-      <h1 class="text-4xl font-bold tracking-tight">SimpleCatalog</h1>
-      <p class="text-gray-600">Минималистичный каталог товаров • данные предоставлены источником</p>
+  <main class="shell">
+    <header class="hero reveal">
+      <p class="eyebrow">Aurum Division</p>
+      <h1>Executive Catalog</h1>
+      <p class="subtitle">Premium selection interface for corporate procurement teams.</p>
     </header>
 
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-      <input id="q" type="search" placeholder="Поиск товаров..."
-        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-
-      <div class="flex gap-2">
-        <button id="refresh"
-          class="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition">
-          Обновить
-        </button>
-
-        <select id="sort"
-          class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400">
+    <section class="toolbar reveal">
+      <div class="toolbar-row">
+        <input id="q" class="field grow" type="search" placeholder="Search products by text or price..." />
+        <select id="sort" class="field">
           <option value="new">Newest</option>
           <option value="old">Oldest</option>
         </select>
+        <select id="view" class="field">
+          <option value="grid">Showcase</option>
+          <option value="list">Executive List</option>
+        </select>
+        <button id="refresh" class="btn" type="button">Refresh</button>
       </div>
-    </div>
+      <div class="meta">
+        <span>Status: <b id="status">Loading...</b></span>
+        <span>Visible: <b id="count">0</b></span>
+      </div>
+    </section>
 
-    <div class="flex justify-between text-sm text-gray-500 mb-2">
-      <div id="status">Loading…</div>
-      <div id="count"></div>
-    </div>
+    <section id="workspace" class="workspace reveal"></section>
+  </main>
 
-    <div id="grid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-    <footer class="mt-10 text-xs text-gray-400 text-center">
-      © SimpleCatalog — лёгкий просмотр товаров
-    </footer>
-  </div>
-
-  <!-- общая логика -->
-  <script src="./viewer.js" defer></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script defer src="./themes/shared/mock-data.js?v=20260305-1"></script>
+  <script defer src="./themes/shared/image-fallbacks.js?v=20260305-1"></script>
+  <script defer src="./themes/corporate-luxe/q7r8s2t4.js?v=20260305-3"></script>
 </body>
 </html>
+
+

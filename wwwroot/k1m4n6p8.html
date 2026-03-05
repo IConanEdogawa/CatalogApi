@@ -3,49 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ProductHub – List Catalog</title>
-
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Aether Forge Catalog</title>
+  <link rel="stylesheet" href="./themes/steampunk/k1m4n6p8.css?v=20260305-3" />
+  <!-- Reserve theme (manual): <link rel="stylesheet" href="./themes/deep-teal/unified-theme.css?v=20260305-1" /> -->
 </head>
+<body>
+  <main class="frame" data-site="c">
+    <section class="topbar">
+      <h1 class="title">Aether Forge Catalogue</h1>
+      <p class="subtitle">Experimental steampunk storefront for Site C</p>
+    </section>
 
-<body data-site="b" class="bg-gray-50 text-gray-900">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-    <header class="mb-6">
-      <h1 class="text-3xl font-extrabold tracking-tight">ProductHub</h1>
-      <p class="text-gray-600">Лента товаров • данные предоставлены источником</p>
-    </header>
-
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-      <input id="q" type="search" placeholder="Поиск..."
-        class="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-
-      <div class="flex gap-2">
-        <button id="refresh"
-          class="px-3 py-2 bg-indigo-100 text-indigo-700 border border-indigo-200 rounded hover:bg-indigo-200 transition">
-          ⟳
-        </button>
-
-        <select id="sort"
-          class="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400">
+    <section class="controls">
+      <div class="row">
+        <input id="q" class="field" type="search" placeholder="Search by text or price..." />
+        <select id="sort" class="select">
           <option value="new">Newest</option>
           <option value="old">Oldest</option>
         </select>
+        <select id="view" class="select">
+          <option value="cabinet">Cabinet</option>
+          <option value="ledger">Ledger</option>
+        </select>
+        <button id="refresh" class="button" type="button">Recalibrate</button>
       </div>
-    </div>
+      <div class="meta">
+        <div>Status: <b id="status">Loading...</b></div>
+        <div>Visible units: <b id="count">0</b></div>
+      </div>
+    </section>
 
-    <div class="flex justify-between text-sm text-gray-500 mb-2">
-      <div id="status">Loading…</div>
-      <div id="count"></div>
-    </div>
+    <section id="workspace" class="workspace"></section>
+  </main>
 
-    <div id="grid" class="mt-2 space-y-2"></div>
-
-    <footer class="mt-10 text-xs text-gray-400">
-      © ProductHub — все права защищены
-    </footer>
-  </div>
-
-  <!-- подключаем общую логику -->
-  <script src="./viewer.js" defer></script>
+  <script defer src="./themes/shared/mock-data.js?v=20260305-1"></script>
+  <script defer src="./themes/shared/image-fallbacks.js?v=20260305-1"></script>
+  <script defer src="./themes/steampunk/k1m4n6p8.js?v=20260305-2"></script>
 </body>
 </html>
+
+

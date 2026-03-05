@@ -1,0 +1,78 @@
+// Reserve color theme: deep-teal
+// Manual opt-in only (keep links commented in HTML)
+
+:root {
+  --dt-bg-0: #011c24;
+  --dt-bg-1: #022a34;
+  --dt-bg-2: #03323d;
+  --dt-panel: #063944;
+  --dt-panel-soft: #0a4855;
+  --dt-line: #0f5f6f;
+  --dt-text: #c9f0ea;
+  --dt-text-soft: #8ecac0;
+  --dt-accent: #2ccdb6;
+  --dt-accent-2: #19a692;
+  --dt-ok: #5de3b5;
+  --dt-warn: #f0c37b;
+}
+
+/* Site A */
+body[data-site="a"] {
+  background: linear-gradient(160deg, var(--dt-bg-0), var(--dt-bg-2));
+  color: var(--dt-text);
+}
+
+body[data-site="a"] #q,
+body[data-site="a"] #refresh,
+body[data-site="a"] #sort {
+  background: var(--dt-panel);
+  border-color: var(--dt-line);
+  color: var(--dt-text);
+}
+
+/* Site B (corporate-luxe) */
+body[data-site="b"] {
+  background: radial-gradient(900px 520px at 10% -20%, #075566 0%, transparent 60%), var(--dt-bg-0);
+  color: var(--dt-text);
+}
+
+body[data-site="b"] .hero,
+body[data-site="b"] .toolbar,
+body[data-site="b"] .card,
+body[data-site="b"] .row-item {
+  background: linear-gradient(165deg, var(--dt-bg-1), var(--dt-bg-2));
+  border-color: var(--dt-line);
+}
+
+body[data-site="b"] .field,
+body[data-site="b"] .btn {
+  background: var(--dt-panel);
+  border-color: var(--dt-line);
+  color: var(--dt-text);
+}
+
+body[data-site="b"] .price {
+  background: rgba(44, 205, 182, 0.12);
+  border-color: rgba(44, 205, 182, 0.4);
+}
+
+/* Site C (steampunk page uses main[data-site="c"]) */
+main[data-site="c"] {
+  color: var(--dt-text);
+}
+
+main[data-site="c"] .frame,
+main[data-site="c"] .topbar,
+main[data-site="c"] .card,
+main[data-site="c"] .ledger {
+  background: linear-gradient(165deg, var(--dt-bg-1), var(--dt-bg-2));
+  border-color: var(--dt-line);
+}
+
+main[data-site="c"] .field,
+main[data-site="c"] .select,
+main[data-site="c"] .button {
+  background: var(--dt-panel);
+  border-color: var(--dt-line);
+  color: var(--dt-text);
+}

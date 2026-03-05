@@ -60,6 +60,12 @@ function costClasses(){
     : "inline-flex items-center px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 font-semibold text-sm";
 }
 
+function formatKrw(input){
+  const digits = String(input ?? "").replace(/\D/g, "");
+  if(!digits) return "가격 미정";
+  return `₩ ${Number(digits).toLocaleString("ko-KR")}`;
+}
+
 let allProducts = [];
 
 // ---------- helpers ----------
@@ -115,7 +121,7 @@ function renderProducts(items){
 
     const img = resolveImage(p.imageUrl);
     const link = escapeHtml(p.linkUrl);
-    const cost = escapeHtml(p.cost || "");
+    const cost = escapeHtml(formatKrw(p.cost || ""));
     const text = escapeHtml(p.text);
 
     // build markup with classes determined by helpers
@@ -129,7 +135,7 @@ function renderProducts(items){
         </div>
 
         <div class="p-4 space-y-3">
-          <div class="${costClasses()}">${cost || "Price unavailable"}</div>
+          <div class="${costClasses()}">${cost}</div>
 
           <div class="${textClasses()}">${text}</div>
 

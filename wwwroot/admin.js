@@ -47,6 +47,12 @@ function updateCounter(){
   countEl.textContent = textEl.value.length;
 }
 
+function formatKrw(input){
+  const digits = String(input ?? "").replace(/\D/g, "");
+  if(!digits) return "";
+  return `₩ ${Number(digits).toLocaleString("ko-KR")}`;
+}
+
 // ---------- preview ----------
 
 function updatePreview(){
@@ -54,7 +60,7 @@ function updatePreview(){
   const cost = costEl.value.trim();
   const text = textEl.value.trim();
 
-  previewCost.textContent = cost || "Cost will appear here...";
+  previewCost.textContent = formatKrw(cost) || "가격이 여기에 표시됩니다...";
   previewText.textContent = text || "Your description will appear here...";
   previewLink.href = isValidUrl(linkUrl) ? linkUrl : "#";
 }
@@ -75,6 +81,12 @@ imageFileEl.addEventListener("change", () => {
     previewSkeleton.classList.add("hidden");
     previewImage.classList.remove("hidden");
   };
+});
+
+costEl.addEventListener("input", () => {
+  const digits = costEl.value.replace(/\D/g, "");
+  costEl.value = digits;
+  updatePreview();
 });
 
 // ---------- API ping ----------
@@ -118,7 +130,7 @@ form.addEventListener("submit", async (e) => {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("linkUrl", linkUrl);
-    formData.append("cost", cost);
+    formData.append("cost", cost.replace(/\D/g, ""));
     formData.append("text", text);
     formData.append("site", siteEl.value);
 

@@ -99,7 +99,11 @@ static async Task<AdminsFile> LoadAdminsAsync(string path)
             return new AdminsFile();
 
         var json = await File.ReadAllTextAsync(path);
-        return JsonSerializer.Deserialize<AdminsFile>(json) ?? new AdminsFile();
+        return JsonSerializer.Deserialize<AdminsFile>(
+    json,
+    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+) ?? new AdminsFile();
+
     }
     catch
     {

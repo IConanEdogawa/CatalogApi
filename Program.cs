@@ -37,6 +37,8 @@ var jwtSecret =
     ?? throw new Exception("JWT_SECRET is not set (set it in systemd env).");
 
 const string AdminCookieName = "admin_token";
+const string AdminPagePath = "/z3x9v7w1.html";
+const string LoginPagePath = "/login.html";
 
 var jwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
 
@@ -72,6 +74,22 @@ var app = builder.Build();
 // -------------------- Middleware --------------------
 
 app.UseCors("AllowAll");
+
+app.Use(async (ctx, next) =>
+{
+    var path = ctx.Request.Path.Value ?? "";
+
+    if (path.Equals(AdminPagePath, StringComparison.OrdinalIgnoreCase))
+    {
+        if (!HasValidAdminCookie(ctx.Request, AdminCookieName, jwtKey))
+        {
+            ctx.Response.Redirect(LoginPagePath);
+            return;
+        }
+    }
+
+    await next();
+});
 
 app.UseStaticFiles();
 
@@ -118,6 +136,37 @@ static bool FixedEquals(string a, string b)
     var ba = Encoding.UTF8.GetBytes(a ?? "");
     var bb = Encoding.UTF8.GetBytes(b ?? "");
     return ba.Length == bb.Length && CryptographicOperations.FixedTimeEquals(ba, bb);
+}
+
+static bool HasValidAdminCookie(
+    HttpRequest req,
+    string cookieName,
+    SecurityKey signingKey)
+{
+    if (!req.Cookies.TryGetValue(cookieName, out var token) ||
+        string.IsNullOrWhiteSpace(token))
+        return false;
+
+    var handler = new JwtSecurityTokenHandler();
+
+    try
+    {
+        var principal = handler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = signingKey,
+            ClockSkew = TimeSpan.FromMinutes(2)
+        }, out _);
+
+        return principal.HasClaim("role", "admin");
+    }
+    catch
+    {
+        return false;
+    }
 }
 
 // -------------------- Routes --------------------
@@ -175,7 +224,7 @@ app.MapPost("/api/admin/login", async (HttpContext ctx, LoginRequest req) =>
         Path = "/"
     });
 
-    return Results.Json(new { ok = true, redirect = "/f9b3c1a2.html" });
+    return Results.Json(new { ok = true, redirect = AdminPagePath });
 });
 
 app.MapPost("/api/admin/logout", (HttpContext ctx) =>

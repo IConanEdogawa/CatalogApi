@@ -43,6 +43,18 @@ function isValidUrl(s){
   }
 }
 
+function normalizeDigits(input){
+  const mapped = Array.from(String(input ?? "")).map((ch) => {
+    const code = ch.codePointAt(0);
+    if(code >= 0x30 && code <= 0x39) return ch; // 0-9
+    if(code >= 0xFF10 && code <= 0xFF19) return String.fromCharCode(code - 0xFF10 + 0x30); // full-width
+    if(code >= 0x0660 && code <= 0x0669) return String.fromCharCode(code - 0x0660 + 0x30); // Arabic-Indic
+    if(code >= 0x06F0 && code <= 0x06F9) return String.fromCharCode(code - 0x06F0 + 0x30); // Eastern Arabic-Indic
+    return "";
+  });
+  return mapped.join("");
+}
+
 function updateCounter(){
   countEl.textContent = textEl.value.length;
 }
@@ -84,7 +96,7 @@ imageFileEl.addEventListener("change", () => {
 });
 
 costEl.addEventListener("input", () => {
-  const digits = costEl.value.replace(/\D/g, "");
+  const digits = normalizeDigits(costEl.value);
   costEl.value = digits;
   updatePreview();
 });
@@ -116,7 +128,8 @@ form.addEventListener("submit", async (e) => {
 
   const file = imageFileEl.files[0];
   const linkUrl = linkUrlEl.value.trim();
-  const cost = costEl.value.trim();
+  const costRaw = costEl.value.trim();
+  const cost = normalizeDigits(costRaw);
   const text = textEl.value.trim();
 
   if(!file){ setMsg("Image file required", "err"); return; }
@@ -133,6 +146,7 @@ form.addEventListener("submit", async (e) => {
     formData.append("linkUrl", linkUrl);
     formData.append("url", linkUrl);
     formData.append("cost", cost.replace(/\D/g, ""));
+    formData.append("costRaw", costRaw);
     formData.append("text", text);
     formData.append("site", siteEl.value);
     formData.append("catalog", siteEl.value);

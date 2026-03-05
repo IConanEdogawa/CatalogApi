@@ -319,6 +319,13 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db, ILogge
         linkUrl = form["url"].ToString();
 
     var cost = form["cost"].ToString();
+    if (string.IsNullOrWhiteSpace(cost))
+        cost = form["price"].ToString();
+
+    var costRaw = form["costRaw"].ToString();
+    if (string.IsNullOrWhiteSpace(cost) && !string.IsNullOrWhiteSpace(costRaw))
+        cost = new string(costRaw.Where(char.IsDigit).ToArray());
+
     var text = form["text"].ToString();
 
     var siteRaw = form["site"].ToString();
@@ -344,6 +351,7 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db, ILogge
     {
         logger.LogWarning("Create product rejected: required fields missing. linkUrl={HasLink} cost={HasCost} text={HasText}",
             !string.IsNullOrWhiteSpace(linkUrl), !string.IsNullOrWhiteSpace(cost), !string.IsNullOrWhiteSpace(text));
+        logger.LogWarning("Create product form keys: {Keys}", string.Join(", ", form.Keys));
         return Results.BadRequest("linkUrl, cost and text are required.");
     }
 

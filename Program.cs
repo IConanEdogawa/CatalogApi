@@ -109,6 +109,22 @@ using (var scope = app.Services.CreateScope())
 static bool IsValidUrl(string s) =>
     Uri.TryCreate(s, UriKind.Absolute, out _);
 
+static string? NormalizeSite(string? raw)
+{
+    var site = (raw ?? "").Trim().ToLowerInvariant();
+
+    if (string.IsNullOrWhiteSpace(site))
+        return "a";
+
+    return site switch
+    {
+        "a" or "catalog-a" or "site-a" => "a",
+        "b" or "catalog-b" or "site-b" => "b",
+        "c" or "catalog-c" or "site-c" => "c",
+        _ => null
+    };
+}
+
 static async Task<AdminsFile> LoadAdminsAsync(string path)
 {
     try
@@ -248,16 +264,21 @@ app.MapGet("/api/admin/me", (ClaimsPrincipal user) =>
 
 app.MapGet("/api/products", async (HttpRequest req, AppDbContext db) =>
 {
-    var site = req.Query["site"].ToString().Trim().ToLowerInvariant();
+    var site = NormalizeSite(req.Query["site"].ToString());
 
     var q = db.Products.AsQueryable();
 
-    if (!string.IsNullOrWhiteSpace(site))
+    if (site is null)
+        return Results.BadRequest("Invalid site.");
+
+    if (!string.IsNullOrWhiteSpace(req.Query["site"]))
         q = q.Where(p => p.Site == site);
 
-    return await q
+    var items = await q
         .OrderByDescending(x => x.Id)
         .ToListAsync();
+    
+    return Results.Json(items);
 });
 
 // -------------------- API: Create Product (ADMIN ONLY) --------------------
@@ -271,14 +292,18 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
 
     var file = form.Files.GetFile("image");
     var linkUrl = form["linkUrl"].ToString();
+    if (string.IsNullOrWhiteSpace(linkUrl))
+        linkUrl = form["url"].ToString();
+
     var cost = form["cost"].ToString();
     var text = form["text"].ToString();
 
-    var site = form["site"].ToString().Trim().ToLowerInvariant();
-    if (string.IsNullOrWhiteSpace(site))
-        site = "a";
+    var siteRaw = form["site"].ToString();
+    if (string.IsNullOrWhiteSpace(siteRaw))
+        siteRaw = form["catalog"].ToString();
 
-    if (site is not ("a" or "b" or "c"))
+    var site = NormalizeSite(siteRaw);
+    if (site is null)
         return Results.BadRequest("Invalid site.");
 
     if (file is null || file.Length == 0)

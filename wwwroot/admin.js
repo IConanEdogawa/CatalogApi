@@ -96,7 +96,8 @@ async function pingApi(){
 
   try{
     const res = await fetch(`/api/products`, {
-      headers: { "Accept": "application/json" }
+      headers: { "Accept": "application/json" },
+      credentials: "same-origin"
     });
     if(!res.ok) throw new Error();
 
@@ -130,14 +131,17 @@ form.addEventListener("submit", async (e) => {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("linkUrl", linkUrl);
+    formData.append("url", linkUrl);
     formData.append("cost", cost.replace(/\D/g, ""));
     formData.append("text", text);
     formData.append("site", siteEl.value);
+    formData.append("catalog", siteEl.value);
 
     // same-origin POST
     const res = await fetch(`/api/products`, {
       method: "POST",
-      body: formData
+      body: formData,
+      credentials: "same-origin"
     });
 
     if(!res.ok){
@@ -154,7 +158,8 @@ form.addEventListener("submit", async (e) => {
     updateCounter();
     updatePreview();
   }catch(err){
-    setMsg("Failed to create.", "err");
+    const reason = err?.message ? String(err.message) : "Unknown error";
+    setMsg(`Failed to create: ${reason}`, "err");
   }finally{
     submitBtn.disabled = false;
   }

@@ -161,7 +161,12 @@ static bool HasValidAdminCookie(
             ClockSkew = TimeSpan.FromMinutes(2)
         }, out _);
 
-        return principal.HasClaim("role", "admin");
+        if (principal.Identity?.IsAuthenticated != true)
+            return false;
+
+        return principal.Claims.Any(c =>
+            (c.Type == "role" || c.Type == ClaimTypes.Role) &&
+            string.Equals(c.Value, "admin", StringComparison.Ordinal));
     }
     catch
     {

@@ -295,10 +295,14 @@ app.MapPost("/api/products", async (HttpRequest request, AppDbContext db) =>
     var ext = Path.GetExtension(file.FileName);
 
     var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    { ".jpg", ".jpeg", ".png", ".webp" };
+    {
+        ".jpg", ".jpeg", ".jpe", ".jfif", ".pjpeg", ".pjp",
+        ".png", ".webp", ".avif", ".gif", ".bmp",
+        ".tif", ".tiff", ".heic", ".heif"
+    };
 
     if (string.IsNullOrWhiteSpace(ext) || !allowed.Contains(ext))
-        return Results.BadRequest("Only jpg/jpeg/png/webp allowed.");
+        return Results.BadRequest("Unsupported image format.");
 
     var webRoot = app.Environment.WebRootPath ?? "wwwroot";
     var uploadsDir = Path.Combine(webRoot, "uploads");

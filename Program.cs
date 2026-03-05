@@ -108,27 +108,12 @@ static async Task<AdminsFile> LoadAdminsAsync(string path)
     }
 }
 
-static bool VerifyKey(string key, string base64SaltHash)
+// constant-time сравнение, чтобы без “таймингов”
+static bool FixedEquals(string a, string b)
 {
-    byte[] blob;
-    try { blob = Convert.FromBase64String(base64SaltHash); }
-    catch { return false; }
-
-    // salt(16) + hash(32) = 48 bytes
-    if (blob.Length != 48) return false;
-
-    var salt = blob[..16];
-    var expected = blob[16..];
-
-    using var pbkdf2 = new Rfc2898DeriveBytes(
-        password: key,
-        salt: salt,
-        iterations: 120_000,
-        hashAlgorithm: HashAlgorithmName.SHA256);
-
-    var actual = pbkdf2.GetBytes(32);
-
-    return CryptographicOperations.FixedTimeEquals(actual, expected);
+    var ba = Encoding.UTF8.GetBytes(a ?? "");
+    var bb = Encoding.UTF8.GetBytes(b ?? "");
+    return ba.Length == bb.Length && CryptographicOperations.FixedTimeEquals(ba, bb);
 }
 
 // -------------------- Routes --------------------
@@ -159,7 +144,7 @@ app.MapPost("/api/admin/login", async (HttpContext ctx, LoginRequest req) =>
     if (admin is null)
         return Results.Unauthorized();
 
-    if (!VerifyKey(key, admin.KeyHash))
+    if (!FixedEquals(key, admin.Key))
         return Results.Unauthorized();
 
     var expires = DateTime.UtcNow.AddDays(30);
@@ -310,7 +295,7 @@ class AdminsFile
 class AdminEntry
 {
     public string Email { get; set; } = "";
-    public string KeyHash { get; set; } = ""; // base64(salt+hash)
+    public string Key { get; set; } = ""; // прямой “сложный пароль”
 }
 
 record LoginRequest(string Email, string Key);

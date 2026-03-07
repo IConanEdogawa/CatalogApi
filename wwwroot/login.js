@@ -12,6 +12,55 @@ const blob1 = document.querySelector(".blob.b1");
 const blob2 = document.querySelector(".blob.b2");
 const cursorDot = document.getElementById("cursorDot");
 const cursorRing = document.getElementById("cursorRing");
+const loginBrandTitle = document.getElementById("loginBrandTitle");
+
+const SITE_SETTINGS_KEY = "catalog_site_a_settings_v1";
+const isStandalonePwa =
+  (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+  window.navigator.standalone === true;
+const developerModeAvailable = !isStandalonePwa;
+
+const THEME_PRESETS = {
+  legacy: { bodyBg: "#020617", cardBg: "#0f172a", accent: "#059669", borderColor: "#1e293b", circleColor: "transparent", circleSize: "340px", circleOpacity: "0", flat: true },
+  midnight: { bodyBg: "#020617", cardBg: "rgba(15,23,42,.92)", accent: "#10b981", circleColor: "rgba(56,189,248,.25)", circleSize: "420px", circleOpacity: "0.35" },
+  ocean: { bodyBg: "#04111f", cardBg: "rgba(7,29,48,.9)", accent: "#38bdf8", circleColor: "rgba(59,130,246,.28)", circleSize: "460px", circleOpacity: "0.34" },
+  forest: { bodyBg: "#03110a", cardBg: "rgba(6,31,19,.92)", accent: "#22c55e", circleColor: "rgba(16,185,129,.24)", circleSize: "440px", circleOpacity: "0.32" },
+  amber: { bodyBg: "#1a1102", cardBg: "rgba(53,33,6,.9)", accent: "#f59e0b", circleColor: "rgba(245,158,11,.25)", circleSize: "430px", circleOpacity: "0.3" },
+  mono: { bodyBg: "#0b0b0b", cardBg: "rgba(30,30,30,.94)", accent: "#a3a3a3", circleColor: "rgba(212,212,212,.2)", circleSize: "400px", circleOpacity: "0.28" }
+};
+
+function readSiteSettings() {
+  try {
+    const raw = localStorage.getItem(SITE_SETTINGS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function applyLoginSettings() {
+  const settings = readSiteSettings();
+  if (!settings) return;
+
+  const title = settings?.texts?.title;
+  if (title && loginBrandTitle) loginBrandTitle.textContent = title;
+
+  const preset = settings?.themePreset;
+  const useManualTheme = developerModeAvailable && Boolean(settings?.dev?.enabled);
+  const theme = useManualTheme
+    ? {
+        ...(THEME_PRESETS[preset] || THEME_PRESETS.midnight),
+        ...(settings?.dev?.manualTheme || {})
+      }
+    : (THEME_PRESETS[preset] || THEME_PRESETS.midnight);
+
+  document.documentElement.style.setProperty("--bg", theme.bodyBg);
+  document.documentElement.style.setProperty("--card", theme.cardBg);
+  document.documentElement.style.setProperty("--card2", theme.cardBg);
+  document.documentElement.style.setProperty("--accent1", theme.accent);
+  document.documentElement.style.setProperty("--accent2", theme.accent);
+}
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isTouch = window.matchMedia("(pointer: coarse)").matches;
@@ -172,6 +221,11 @@ setupMotionEffects();
 setupCustomCursor();
 setupMagneticButton();
 setupRipple();
+applyLoginSettings();
+window.addEventListener("storage", (e) => {
+  if (e.key !== SITE_SETTINGS_KEY) return;
+  applyLoginSettings();
+});
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();

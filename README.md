@@ -9,3 +9,10 @@ api (simple)
 ![Login preview](wwwroot/image.png)
 
 About login page: this page is used for user sign in.
+
+## Tailwind (production local build)
+- Install deps once: `npm install`
+- Build CSS: `npm run build:css`
+- Watch during edits: `npm run watch:css`
+
+Output file: `wwwroot/css/tailwind.css`

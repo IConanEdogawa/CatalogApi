@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <link rel="manifest" href="./manifest-admin.webmanifest" />
   <title>Admin Login</title>
   <meta name="color-scheme" content="dark" />
   <style>
@@ -363,7 +365,7 @@
         <div class="brand">
           <div class="logo" aria-hidden="true"></div>
           <div>
-            <h1>Admin Panel</h1>
+            <h1><a id="loginBrandTitle" href="./f9b3c1a2.html" style="color:inherit;text-decoration:none">Opanot com</a></h1>
             <p class="sub">Вход по email + ключу. Ключ можно менять (rotation) без почты.</p>
           </div>
         </div>
@@ -418,6 +420,7 @@
   <div class="cursorDot" id="cursorDot" aria-hidden="true"></div>
   <div class="cursorRing" id="cursorRing" aria-hidden="true"></div>
 
+  <script src="./pwa-register.js"></script>
   <script src="./login.js"></script>
 </body>
 </html>

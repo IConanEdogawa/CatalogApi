@@ -1,12 +1,14 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="./manifest-catalog.webmanifest" />
   <title>Catalog</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/tailwind.css" />
   <!-- Reserve theme (manual): <link rel="stylesheet" href="./themes/deep-teal/unified-theme.css?v=20260305-1" /> -->
 
   <style>
@@ -25,9 +27,9 @@
 <body data-site="a" class="bg-slate-950 text-slate-100">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
     <div class="flex flex-col gap-2">
-      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Product Catalog</h1>
-      <p class="text-slate-350">
-        이 게시물은 쿠팡파트너스 활동의일환으로,이에따른 일정액의 수수료를 제공받습니다.
+      <a id="brandTitle" href="./f9b3c1a2.html" class="text-2xl sm:text-3xl font-bold tracking-tight hover:text-emerald-300 transition">Opanot com</a>
+      <p id="siteNotice" class="text-slate-350">
+        이 게시물은 쿠팡파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </p>
     </div>
 
@@ -38,15 +40,21 @@
       </div>
 
       <div class="flex gap-3">
+        <a id="adminLink"
+          href="./z3x9v7w1.html"
+          class="hidden px-4 py-3 rounded-2xl bg-indigo-700/80 border border-indigo-600 hover:bg-indigo-600 transition">
+          Admin
+        </a>
+
         <button id="refresh"
           class="px-4 py-3 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-600 transition">
-          Refresh
+          <span id="refreshLabel">Refresh</span>
         </button>
 
         <select id="sort"
           class="px-4 py-3 rounded-2xl bg-slate-900 border border-slate-800 outline-none focus:border-slate-500">
-          <option value="new">Newest</option>
-          <option value="old">Oldest</option>
+          <option id="sortNewLabel" value="new">Newest</option>
+          <option id="sortOldLabel" value="old">Oldest</option>
         </select>
       </div>
     </div>
@@ -58,12 +66,14 @@
 
     <div id="grid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-    <div class="mt-10 text-xs text-slate-500">
-      Catalog viewer • Images and links are provided by the product source.
+    <div id="footerNote" class="mt-10 text-xs text-slate-500">
+      Catalog viewer вЂў Images and links are provided by the product source.
     </div>
   </div>
 
-  <!-- only ONE script -->
+  <script src="./mock-products.js?v=20260307-1" defer></script>
+  <script src="./pwa-register.js" defer></script>
   <script src="./viewer.js" defer></script>
 </body>
 </html>
+

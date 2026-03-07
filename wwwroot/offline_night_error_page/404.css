@@ -1,0 +1,523 @@
+:root {
+  --bg-1: #060816;
+  --bg-2: #0b1023;
+  --bg-3: #151b35;
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #eef2ff;
+  --muted: #b6bfd9;
+  --accent: #88a8ff;
+  --accent-2: #8ef0d2;
+  --danger: #ff8cb7;
+  --shadow: 0 20px 80px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(136, 168, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 80% 30%, rgba(142, 240, 210, 0.1), transparent 24%),
+    radial-gradient(circle at 50% 85%, rgba(255, 140, 183, 0.08), transparent 24%),
+    linear-gradient(160deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+  color: var(--text);
+}
+
+body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.stars,
+.mist,
+.grid,
+.orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stars {
+  background-image:
+    radial-gradient(2px 2px at 12% 22%, rgba(255, 255, 255, 0.8), transparent 60%),
+    radial-gradient(2px 2px at 78% 18%, rgba(255, 255, 255, 0.65), transparent 60%),
+    radial-gradient(1.8px 1.8px at 55% 10%, rgba(255, 255, 255, 0.8), transparent 60%),
+    radial-gradient(1.5px 1.5px at 38% 72%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(1.5px 1.5px at 88% 66%, rgba(255, 255, 255, 0.65), transparent 60%),
+    radial-gradient(2px 2px at 22% 82%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(1.5px 1.5px at 68% 84%, rgba(255, 255, 255, 0.7), transparent 60%);
+  opacity: 0.8;
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+
+.mist {
+  background:
+    radial-gradient(circle at 30% 40%, rgba(136, 168, 255, 0.1), transparent 30%),
+    radial-gradient(circle at 70% 60%, rgba(142, 240, 210, 0.09), transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03), transparent 45%);
+  filter: blur(20px);
+  animation: drift 16s ease-in-out infinite alternate;
+}
+
+.grid {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 18%, rgba(0, 0, 0, 0.9) 75%, transparent);
+  opacity: 0.18;
+  transform: perspective(900px) rotateX(70deg) translateY(35%);
+  transform-origin: center;
+  animation: pulseGrid 7s ease-in-out infinite;
+}
+
+.orbs::before,
+.orbs::after {
+  content: "";
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  filter: blur(45px);
+  opacity: 0.17;
+}
+
+.orbs::before {
+  background: var(--accent);
+  top: 10%;
+  left: 8%;
+  animation: floatA 12s ease-in-out infinite;
+}
+
+.orbs::after {
+  background: var(--danger);
+  bottom: 6%;
+  right: 10%;
+  animation: floatB 14s ease-in-out infinite;
+}
+
+.shell {
+  position: relative;
+  width: min(100%, 980px);
+  z-index: 2;
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 24px;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.05));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  animation: fadeUp 0.9s ease both;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(136, 168, 255, 0.08), transparent 35%, rgba(142, 240, 210, 0.05) 70%, transparent);
+  pointer-events: none;
+}
+
+.left,
+.right {
+  position: relative;
+  z-index: 1;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 14px var(--accent-2);
+  animation: blink 1.8s ease-in-out infinite;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(40px, 7vw, 74px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.sub {
+  margin: 18px 0 0;
+  max-width: 52ch;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.chip {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #dbe6ff;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.btn {
+  appearance: none;
+  border: 0;
+  outline: none;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn.primary {
+  color: #06101f;
+  background: linear-gradient(135deg, #dce6ff, #8ef0d2);
+  box-shadow: 0 10px 30px rgba(142, 240, 210, 0.18);
+}
+
+.btn.secondary {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.console {
+  position: relative;
+  min-height: 360px;
+  padding: 22px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(5, 10, 25, 0.9), rgba(10, 14, 31, 0.82));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.console::after {
+  content: "";
+  position: absolute;
+  inset: auto -30% -55% -30%;
+  height: 220px;
+  background: radial-gradient(circle, rgba(136, 168, 255, 0.18), transparent 60%);
+  filter: blur(10px);
+}
+
+.console-top {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.console-top span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.moon {
+  width: 88px;
+  height: 88px;
+  margin: 4px auto 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f8fbff, #b5c7ff 58%, #738de0 100%);
+  box-shadow: 0 0 40px rgba(181, 199, 255, 0.3);
+  position: relative;
+  animation: moonFloat 5s ease-in-out infinite;
+}
+
+.moon::after {
+  content: "";
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  right: -6px;
+  top: 7px;
+  background: rgba(7, 10, 25, 0.82);
+}
+
+.terminal-line {
+  color: #cdd9ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.85;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 2px solid rgba(255, 255, 255, 0.55);
+  width: 0;
+  animation: typing 4.8s steps(48, end) infinite, caret 0.9s step-end infinite;
+}
+
+.terminal-line:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.terminal-line:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+.terminal-line:nth-child(6) {
+  animation-delay: 1.2s;
+}
+
+.status-boxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.status {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.status strong {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.status span {
+  font-size: 15px;
+  color: #f2f5ff;
+}
+
+.footer-note {
+  text-align: center;
+  margin-top: 18px;
+  color: rgba(230, 236, 255, 0.56);
+  font-size: 13px;
+  animation: fadeUp 1.3s ease both;
+}
+
+@media (max-width: 860px) {
+  .panel {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+
+  .console {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 14px;
+  }
+
+  h1 {
+    font-size: clamp(34px, 9vw, 52px);
+  }
+
+  .sub {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .panel {
+    border-radius: 22px;
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .status-boxes {
+    grid-template-columns: 1fr;
+  }
+
+  .terminal-line {
+    white-space: normal;
+    width: auto;
+    overflow: visible;
+    border-right: 0;
+    animation: none;
+  }
+}
+
+@media (max-height: 760px) {
+  body {
+    place-items: start center;
+  }
+
+  .console {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.95;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 1.5%, 0) scale(1.04);
+  }
+}
+
+@keyframes pulseGrid {
+  0%,
+  100% {
+    opacity: 0.14;
+  }
+  50% {
+    opacity: 0.24;
+  }
+}
+
+@keyframes floatA {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, 24px);
+  }
+}
+
+@keyframes floatB {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-24px, -18px);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes moonFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes typing {
+  0% {
+    width: 0;
+  }
+  40% {
+    width: 100%;
+  }
+  60% {
+    width: 100%;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes caret {
+  50% {
+    border-color: transparent;
+  }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found</title>
+  <link rel="stylesheet" href="/offline_night_error_page/404.css" />
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="mist"></div>
+  <div class="grid"></div>
+  <div class="orbs"></div>
+
+  <main class="shell">
+    <section class="panel">
+      <div class="left">
+        <div class="label"><span class="dot"></span> Lost in the catalog</div>
+        <h1>That page is gone,<br> asleep, or never existed.</h1>
+        <p class="sub">
+          The link may be broken, the ID could be invalid, or your connection might be offline.
+          This page handles common dead-ends: wrong URL, removed content, expired shared links,
+          and network interruptions.
+        </p>
+
+        <div class="chips">
+          <span class="chip">Wrong URL</span>
+          <span class="chip">Offline</span>
+          <span class="chip">Expired link</span>
+          <span class="chip">Missing ID</span>
+        </div>
+
+        <div class="actions">
+          <a class="btn primary" id="returnHome" href="/f9b3c1a2.html">Go to Catalog</a>
+          <button class="btn secondary" id="tryAgain" type="button">Try again</button>
+          <button class="btn secondary" id="goBack" type="button">Go back</button>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="console">
+          <div class="console-top"><span></span><span></span><span></span></div>
+          <div class="moon"></div>
+          <div class="terminal-line">&gt; checking route... failed</div>
+          <div class="terminal-line">&gt; checking resource id... not found</div>
+          <div class="terminal-line">&gt; checking network state... unstable / offline</div>
+          <div class="terminal-line">&gt; suggestion: return to catalog and try a fresh path</div>
+
+          <div class="status-boxes">
+            <div class="status">
+              <strong>Status</strong>
+              <span id="routeStatus">404 / unavailable</span>
+            </div>
+            <div class="status">
+              <strong>Network</strong>
+              <span id="networkStatus">Checking...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">
+      Opanot catalog assistant: find products, prices, and latest updates in one place.
+    </div>
+  </main>
+
+  <script src="/offline_night_error_page/404.js"></script>
+</body>
+</html>

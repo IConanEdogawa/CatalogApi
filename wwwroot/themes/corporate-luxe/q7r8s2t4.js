@@ -263,15 +263,6 @@
     try {
       await loadRemote();
     } catch {
-      const mock = getMock();
-      if (mock.length) {
-        all = mock;
-        render();
-        statusEl.textContent = "Loaded (mock)";
-        statusEl.className = "status-ok";
-        return;
-      }
-
       if (!all.length) {
         workspace.innerHTML = "<div class='empty'>Failed to load products.</div>";
         countEl.textContent = "0";

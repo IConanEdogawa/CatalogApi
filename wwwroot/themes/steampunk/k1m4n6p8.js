@@ -10,6 +10,7 @@
   const fallbackPool = Array.isArray(window.CATALOG_IMAGE_FALLBACKS)
     ? window.CATALOG_IMAGE_FALLBACKS
     : [];
+  const forceMock = new URLSearchParams(window.location.search).get("mock") === "1";
 
   let all = [];
 
@@ -183,6 +184,14 @@
   }
 
   async function load() {
+    if (forceMock) {
+      all = getMock();
+      render();
+      statusEl.textContent = all.length ? "Loaded (mock)" : "Load error";
+      statusEl.className = all.length ? "status-ok" : "status-error";
+      return;
+    }
+
     statusEl.textContent = "Loading...";
     statusEl.className = "";
 
@@ -191,14 +200,6 @@
       render();
       return;
     } catch {
-      const mock = getMock();
-      if (mock.length) {
-        all = mock;
-        render();
-        statusEl.textContent = "Loaded (mock)";
-        statusEl.className = "status-ok";
-        return;
-      }
     }
 
     all = [];

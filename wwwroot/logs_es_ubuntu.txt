@@ -1,0 +1,117 @@
+root@ubuntu-server:~# sudo apt update && sudo apt install -y sqlite3
+Hit:1 http://ubuntu.mirror.constant.com noble InRelease
+Get:2 http://ubuntu.mirror.constant.com noble-updates InRelease [126 kB]
+Get:3 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Get:4 http://ubuntu.mirror.constant.com noble-backports InRelease [126 kB]
+Get:5 http://ubuntu.mirror.constant.com noble-updates/main amd64 Packages [1,806 kB]
+Get:6 http://ubuntu.mirror.constant.com noble-updates/main amd64 Components [177 kB]
+Get:7 http://ubuntu.mirror.constant.com noble-updates/restricted amd64 Components [212 B]
+Get:8 http://ubuntu.mirror.constant.com noble-updates/universe amd64 Packages [1,564 kB]
+Get:9 http://security.ubuntu.com/ubuntu noble-security/main amd64 Components [21.5 kB]
+Get:10 http://ubuntu.mirror.constant.com noble-updates/universe amd64 Components [386 kB]
+Get:11 http://ubuntu.mirror.constant.com noble-updates/multiverse amd64 Components [940 B]
+Get:12 http://ubuntu.mirror.constant.com noble-backports/main amd64 Components [7,340 B]
+Get:13 http://ubuntu.mirror.constant.com noble-backports/restricted amd64 Components [212 B]
+Get:14 http://ubuntu.mirror.constant.com noble-backports/universe amd64 Components [10.5 kB]
+Get:15 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Components [212 B]
+Get:16 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Components [74.2 kB]
+Get:17 http://ubuntu.mirror.constant.com noble-backports/multiverse amd64 Components [212 B]
+Get:18 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Components [212 B]
+Fetched 4,428 kB in 3s (1,470 kB/s)
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+12 packages can be upgraded. Run 'apt list --upgradable' to see them.
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+Suggested packages:
+  sqlite3-doc
+The following NEW packages will be installed:
+  sqlite3
+0 upgraded, 1 newly installed, 0 to remove and 12 not upgraded.
+Need to get 144 kB of archives.
+After this operation, 584 kB of additional disk space will be used.
+Get:1 http://ubuntu.mirror.constant.com noble-updates/main amd64 sqlite3 amd64 3.45.1-1ubuntu2.5 [144 kB]
+Fetched 144 kB in 1s (134 kB/s)
+Selecting previously unselected package sqlite3.
+(Reading database ... 131013 files and directories currently installed.)
+Preparing to unpack .../sqlite3_3.45.1-1ubuntu2.5_amd64.deb ...
+Unpacking sqlite3 (3.45.1-1ubuntu2.5) ...
+Setting up sqlite3 (3.45.1-1ubuntu2.5) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+Scanning processes...
+Scanning candidates...
+Scanning linux images...
+
+Pending kernel upgrade!
+Running kernel version:
+  6.8.0-100-generic
+Diagnostics:
+  The currently running kernel version is not the expected kernel version 6.8.0-101-generic.
+
+Restarting the system to load the new kernel will not be handled automatically, so you should consider rebooting.
+
+Restarting services...
+
+Service restarts being deferred:
+ /etc/needrestart/restart.d/dbus.service
+ systemctl restart unattended-upgrades.service
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+root@ubuntu-server:~# # Посмотреть connection string из реального publish
+cat /var/www/catalogapi/publish/appsettings.json
+
+# Сравнить оба файла БД
+ls -lh /var/www/catalogapi/publish/app.db /var/www/CatalogApi_Data/app.db
+stat /var/www/catalogapi/publish/app.db
+stat /var/www/CatalogApi_Data/app.db
+
+# Проверить таблицы и количество строк
+sqlite3 /var/www/catalogapi/publish/app.db ".tables"
+sqlite3 /var/www/catalogapi/publish/app.db "select count(*) from Products;"
+sqlite3 /var/www/CatalogApi_Data/app.db ".tables"
+sqlite3 /var/www/CatalogApi_Data/app.db "select count(*) from Products;"
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "Default": "Data Source=/var/www/CatalogApi_Data/app.db"
+  },
+  "admins": [
+    { "email": "bekzodbek.baxtiyorov@gmail.com", "key": "57A7A3471400F40E0D814D11492E1BA56645B9EF6389FDBC625F6B255C5A959C" },
+    { "email": "umarhon3005@gmail.com", "key": "2B78ED5BCDC07A3B0476E6D46B9490EE2DF44488FBE1DAFB66037EEBEF3343D8" }
+  ]
+}
+-rw-r--r-- 1 root root 12K Mar  7 04:02 /var/www/CatalogApi_Data/app.db
+-rw-r--r-- 1 root root 12K Mar  5 06:17 /var/www/catalogapi/publish/app.db
+  File: /var/www/catalogapi/publish/app.db
+  Size: 12288           Blocks: 24         IO Block: 4096   regular file
+Device: 253,2   Inode: 2086921     Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2026-03-05 06:24:49.008185409 +0000
+Modify: 2026-03-05 06:17:00.264776231 +0000
+Change: 2026-03-05 06:17:00.264776231 +0000
+ Birth: 2026-03-05 06:09:40.263543550 +0000
+  File: /var/www/CatalogApi_Data/app.db
+  Size: 12288           Blocks: 24         IO Block: 4096   regular file
+Device: 253,2   Inode: 2086645     Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Access: 2026-03-07 04:28:23.528660182 +0000
+Modify: 2026-03-07 04:02:41.776221497 +0000
+Change: 2026-03-07 04:02:41.776221497 +0000
+ Birth: 2026-03-05 11:19:25.306515606 +0000
+Products
+0
+Products
+6
+root@ubuntu-server:~#

@@ -97,10 +97,11 @@ app.UseCors("AllowAll");
 app.Use(async (ctx, next) =>
 {
     var path = ctx.Request.Path.Value ?? "";
+    var allowLocalDevBypass = app.Environment.IsDevelopment();
 
     if (path.Equals(AdminPagePath, StringComparison.OrdinalIgnoreCase))
     {
-        if (!IsLocalDevRequest(ctx.Request) &&
+        if (!(allowLocalDevBypass && IsLocalDevRequest(ctx.Request)) &&
             !HasValidAdminCookie(ctx.Request, AdminCookieName, jwtKey))
         {
             ctx.Response.Redirect(LoginPagePath);
@@ -116,7 +117,7 @@ app.UseStaticFiles();
 app.UseAuthentication();
 app.Use(async (ctx, next) =>
 {
-    if (IsLocalDevRequest(ctx.Request))
+    if (app.Environment.IsDevelopment() && IsLocalDevRequest(ctx.Request))
     {
         var claims = new[]
         {
